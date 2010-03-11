@@ -14,7 +14,12 @@
  * Both methods can take options as a second argument. 
  * This argument must be a hash with the following possible keys:
  * - delimiter: The character used to delimit the string elements
- * - header: An array of words used to manipulate the data
+ * - header: true to use the first line of the file as the haeder, or an array of words used to manipulate the data.
+ * 
+ * The header can only contain words which can be used as JavaScript hash keys:
+ * 
+ * * valid keys: 'name', 'option1', 'groupId', 'group_id'
+ * * invalid keys: '3option', 'group id', 'group-id'
  * 
  * Example of advanced usage:
  * 
@@ -53,7 +58,7 @@ if(typeof CSV.parse !== "function") {
       // Choose wether to split Windows style or Unix style (and pray for it to be consistent)
       breakStr = (lineBreak < 1 || input[lineBreak -1] != '\r')? '\n' : '\r\n';
     
-    input.split(breakStr).forEach(function(line) {
+    input.split(breakStr).forEach(function(line, i) {
       // Cache currLine
       var _currLine = currLine;
       
@@ -61,9 +66,11 @@ if(typeof CSV.parse !== "function") {
       if(!currEl) {
         // Get rid of empty lines
         if(_currLine && (_currLine.length > 1 || _currLine[0] != '')) {
-          output.push(currLine);
+          i == 0 && header === true?
+            header = currLine :
+            output.push(currLine);
         }
-        currLine = header? {} : [];
+        currLine = header instanceof Array? {} : [];
         currRow = 0;
       }
       

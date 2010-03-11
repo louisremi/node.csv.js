@@ -18,8 +18,14 @@ Options:
 
 Both methods can take options as a second argument.
 This argument must be a hash with the following possible keys:
+
   * delimiter: The character used to delimit the string elements
   * header: An array of words used to manipulate the data
+  
+The header can only contain words which can be used as JavaScript hash keys:
+
+  * valid keys: 'name', 'option1', 'groupId', 'group_id'
+  * invalid keys: '3option', 'group id', 'group-id'
 
 Example of advanced usage:
 --------------------------
