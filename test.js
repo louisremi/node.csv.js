@@ -40,49 +40,26 @@ assert.deepEqual(CSV.parse('"abc\r\ndef"'), [['abc\r\ndef']]);
 assert.deepEqual(CSV.parse('"abc"\r\n"def"'), [['abc'],['def']]);
 
 // Quotes inside quotes
-
+assert.deepEqual(CSV.parse('""""'), [['"']]);
+assert.deepEqual(CSV.parse('""""""'), [['""']]);
+assert.deepEqual(CSV.parse('""","""'), [['","']]);
+assert.deepEqual(CSV.parse('""","""""'), [['",""']]);
+assert.deepEqual(CSV.parse('"""\n"""'), [['"\n"']]);
+assert.deepEqual(CSV.parse('"""\n"""""'), [['"\n""']]);
+assert.deepEqual(CSV.parse('"""",""""'), [['"','"']]);
+assert.deepEqual(CSV.parse('""""\n""""'), [['"'],['"']]);
+assert.deepEqual(CSV.parse('"a"""'), [['a"']]);
+assert.deepEqual(CSV.parse('"a"""""'), [['a""']]);
+assert.deepEqual(CSV.parse('"abc"""'), [['abc"']]);
+assert.deepEqual(CSV.parse('"abc"""""'), [['abc""']]);
+assert.deepEqual(CSV.parse('"a""b""c"'), [['a"b"c']]);
+assert.deepEqual(CSV.parse('"a""","""b"'), [['a"', '"b']]);
+assert.deepEqual(CSV.parse('"a"",""b"'), [['a","b']]);
+assert.deepEqual(CSV.parse('"a""""","""b"'), [['a""', '"b']]);
+assert.deepEqual(CSV.parse('"a"""\n"""b"'), [['a"'], ['"b']]);
+assert.deepEqual(CSV.parse('"a""\n""b"'), [['a"\n"b']]);
 
 /*
-// Strings that are not complete elements shouldn't match 
-assert.ok(!re.exec('"'));
-assert.ok(!re.exec('"a'));
-assert.ok(!re.exec('"abc'));
-assert.ok(!re.exec('"a""'));
-assert.ok(!re.exec('"abc""'));
-assert.ok(!re.exec('"abc""d'));
-assert.ok(!re.exec('"abc""def'));
-assert.ok(!re.exec('a""'));
-assert.ok(!re.exec('abc""'));
-assert.ok(!re.exec('abc""d'));
-assert.ok(!re.exec('abc""def'));
-assert.ok(!re.exec('a"""'));
-assert.ok(!re.exec('abc"""'));
-assert.ok(!re.exec('abc""d"'));
-assert.ok(!re.exec('abc""def"'));
-
-// Strings that are complete elements should match
-assert.equal(re.exec('')[0], '');
-
-assert.equal(re.exec('a')[1], 'a');
-assert.equal(re.exec('abc')[1], 'abc');
-
-assert.equal(re.exec('""')[2], '');
-assert.equal(re.exec('"a"')[2], 'a');
-assert.equal(re.exec('"abc"')[2], 'abc');
-assert.equal(re.exec('"abc"""')[2], 'abc""');
-assert.equal(re.exec('"abc""d"')[2], 'abc""d');
-assert.equal(re.exec('"abc""def"')[2], 'abc""def');
-
-/* '"' is incomplete
- * '"a""' is incomplete
- * '"a"' is complete
- * '"""' is incomplete
- * '"a""" is complete
- * '"a""""' is incomplete
- * '""""' is complete
- *
-
-
 assert.equal(typeof CSV.parse, "function", "CSV.parse is a function");
 assert.equal(typeof CSV.stringify, "function", "CSV.stringify is a function");
 
