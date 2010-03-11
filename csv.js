@@ -60,7 +60,7 @@ if(typeof CSV.parse !== "function") {
       // add the current line to the output if not in the middle of an element
       if(!currEl) {
         // Get rid of empty lines
-        if(_currLine && (_currLine.length > 1 || currLine[0] != '')) {
+        if(_currLine && (_currLine.length > 1 || _currLine[0] != '')) {
           output.push(currLine);
         }
         currLine = header? {} : [];
@@ -73,7 +73,7 @@ if(typeof CSV.parse !== "function") {
           quoted, length, trailingQuote = 0;
         
         // restore the delimiter or line break if it was inside an element (_currEl == true) 
-        _currEl = _currEl? _currEl + (i? delimiter : "\n" ) + el : el;
+        _currEl = _currEl? _currEl + (i? delimiter : breakStr ) + el : el;
         // Does the string ends the current element?
         quoted = _currEl[0] == '"';
         length = _currEl.length;
@@ -86,9 +86,9 @@ if(typeof CSV.parse !== "function") {
               trailingQuote++;
             }
             trailingQuote %2?
-              quoted = false :
               // Restore the quotes
-              currEl = '"' + _currEl + '"';
+              currEl = '"' + _currEl + '"' :
+              quoted = false;
           }
           // _currEl is a complete element
           if(!quoted) {
@@ -106,7 +106,10 @@ if(typeof CSV.parse !== "function") {
       });
     });
     // Push the last line and return
-    return output.push(currLine);
+    if(currLine.length > 1 || currLine[0] != '') {
+      output.push(currLine);
+    }
+    return output;
   };
 }
  

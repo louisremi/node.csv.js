@@ -18,8 +18,8 @@ Options:
 
 Both methods can take options as a second argument.
 This argument must be a hash with the following possible keys:
-* delimiter: The character used to delimit the string elements
-* header: An array of words used to manipulate the data
+  * delimiter: The character used to delimit the string elements
+  * header: An array of words used to manipulate the data
 
 Example of advanced usage:
 --------------------------

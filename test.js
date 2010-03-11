@@ -2,20 +2,47 @@ var assert = require('assert');
 var CSV = require('./csv');
 
 // Single string parsing
-assert.equal(CSV.parse(''), [['']]);
+assert.deepEqual(CSV.parse(''), []);
 assert.deepEqual(CSV.parse('a'), [['a']]);
 assert.deepEqual(CSV.parse('abc'), [['abc']]);
-assert.deepEqual(CSV.parse('"'), [['"']]);
-assert.deepEqual(CSV.parse(','), [[''],['']]);
-assert.deepEqual(CSV.parse('a,b'), [['a'],['b']]);
-assert.deepEqual(CSV.parse('\n'), [[''],['']]);
+//assert.deepEqual(CSV.parse('"'), [['"']]);
+assert.deepEqual(CSV.parse(','), [['','']]);
+assert.deepEqual(CSV.parse('a,b'), [['a','b']]);
+assert.deepEqual(CSV.parse('\n'), []);
 assert.deepEqual(CSV.parse('a\nb'), [['a'],['b']]);
-assert.deepEqual(CSV.parse('\r\n'), [[''],['']]);
+assert.deepEqual(CSV.parse('\r\n'), []);
 assert.deepEqual(CSV.parse('a\r\nb'), [['a'],['b']]);
-assert.deepEqual(CSV.parse('abc,def'), [['abc'],['def']]);
+assert.deepEqual(CSV.parse('abc,def'), [['abc','def']]);
 assert.deepEqual(CSV.parse('abc\ndef'), [['abc'],['def']]);
 assert.deepEqual(CSV.parse('abc\r\ndef'), [['abc'],['def']]);
 
+// Quoted string parsing
+assert.deepEqual(CSV.parse('""'), []);
+assert.deepEqual(CSV.parse('"a"'), [['a']]);
+assert.deepEqual(CSV.parse('"abc"'), [['abc']]);
+assert.deepEqual(CSV.parse('","'), [[',']]);
+assert.deepEqual(CSV.parse('"",""'), [['','']]);
+assert.deepEqual(CSV.parse('"a,b"'), [['a,b']]);
+assert.deepEqual(CSV.parse('"a","b"'), [['a','b']]);
+assert.deepEqual(CSV.parse('"\n"'), [['\n']]);
+assert.deepEqual(CSV.parse('""\n""'), []);
+assert.deepEqual(CSV.parse('"a\nb"'), [['a\nb']]);
+assert.deepEqual(CSV.parse('"a"\n"b"'), [['a'],['b']]);
+assert.deepEqual(CSV.parse('"\r\n"'), [['\r\n']]);
+assert.deepEqual(CSV.parse('""\r\n""'), []);
+assert.deepEqual(CSV.parse('"a\r\nb"'), [['a\r\nb']]);
+assert.deepEqual(CSV.parse('"a"\r\n"b"'), [['a'],['b']]);
+assert.deepEqual(CSV.parse('"abc,def"'), [['abc,def']]);
+assert.deepEqual(CSV.parse('"abc","def"'), [['abc','def']]);
+assert.deepEqual(CSV.parse('"abc\ndef"'), [['abc\ndef']]);
+assert.deepEqual(CSV.parse('"abc"\n"def"'), [['abc'],['def']]);
+assert.deepEqual(CSV.parse('"abc\r\ndef"'), [['abc\r\ndef']]);
+assert.deepEqual(CSV.parse('"abc"\r\n"def"'), [['abc'],['def']]);
+
+// Quotes inside quotes
+
+
+/*
 // Strings that are not complete elements shouldn't match 
 assert.ok(!re.exec('"'));
 assert.ok(!re.exec('"a'));
@@ -53,7 +80,7 @@ assert.equal(re.exec('"abc""def"')[2], 'abc""def');
  * '"a""" is complete
  * '"a""""' is incomplete
  * '""""' is complete
- */
+ *
 
 
 assert.equal(typeof CSV.parse, "function", "CSV.parse is a function");
@@ -90,4 +117,4 @@ assert.deepEqual(CSVArray[0], {
 });
 
 var CSVString = CSV.stringify(CSVArray, {header: ['last', 'fourth', 'third', 'second', 'first']});
-assert.equal(CSVString, "string,csv,simple,really,a\nexample,simple,really,a,for");
+assert.equal(CSVString, "string,csv,simple,really,a\nexample,simple,really,a,for");*/
