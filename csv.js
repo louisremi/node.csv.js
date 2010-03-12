@@ -55,8 +55,16 @@ if(typeof CSV.parse !== "function") {
       delimiter = options.delimiter || ',',
       header = options.header,
       lineBreak = input.indexOf('\n'),
-      // Choose wether to split Windows style or Unix style (and pray for it to be consistent)
-      breakStr = (lineBreak < 1 || input[lineBreak -1] != '\r')? '\n' : '\r\n';
+      // Choose wether to split Windows style, Unix style or Mac OS classic style
+      breakStr =
+        // Mac OS Classic?
+        lineBreak == -1 && input.indexOf('\r') != -1?
+          '\r' :
+          // Unix?
+          ((lineBreak == 0 || input[lineBreak -1] != '\r')? 
+            '\n' :
+            // Windows!
+            '\r\n');
     
     input.split(breakStr).forEach(function(line, i) {
       // Cache currLine
