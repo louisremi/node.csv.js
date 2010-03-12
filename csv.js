@@ -16,11 +16,6 @@
  * - delimiter: The character used to delimit the string elements
  * - header: true to use the first line of the file as the haeder, or an array of words used to manipulate the data.
  * 
- * The header can only contain words which can be used as JavaScript hash keys:
- * 
- * * valid keys: 'name', 'option1', 'groupId', 'group_id'
- * * invalid keys: '3option', 'group id', 'group-id'
- * 
  * Example of advanced usage:
  * 
  * var csvArray = csv.parse("a,really,simple,csv,string\nfor,a,really,simple,example", {header: ['first', 'second', 'third', 'fourth', 'last']});
@@ -54,26 +49,26 @@ if(typeof CSV.parse !== "function") {
       currEl,
       delimiter = options.delimiter || ',',
       header = options.header,
-      lineBreak = input.indexOf('\n'),
+      EOLi = input.indexOf('\n'),
       // Choose wether to split Windows style, Unix style or Mac OS classic style
-      breakStr =
+      EOL =
         // Mac OS Classic?
-        lineBreak == -1 && input.indexOf('\r') != -1?
+        EOLi == -1 && input.indexOf('\r') != -1?
           '\r' :
           // Unix?
-          ((lineBreak == 0 || input[lineBreak -1] != '\r')? 
+          (input[EOLi -1] != '\r'? 
             '\n' :
             // Windows!
-            '\r\n');
+            '\r\n'
+          );
     
-    input.split(breakStr).forEach(function(line, i) {
+    input.split(EOL).forEach(function(line, i) {
       // Cache currLine
       var _currLine = currLine;
       
       // add the current line to the output if not in the middle of an element
       if(!currEl) {
-        // Get rid of empty lines
-        if(_currLine && (_currLine.length > 1 || _currLine[0] != '')) {
+        if(_currLine) {
           i == 0 && header === true?
             header = currLine :
             output.push(currLine);
@@ -88,7 +83,7 @@ if(typeof CSV.parse !== "function") {
           quoted, length, trailingQuote = 0;
         
         // restore the delimiter or line break if it was inside an element (_currEl == true) 
-        _currEl = _currEl? _currEl + (i? delimiter : breakStr ) + el : el;
+        _currEl = _currEl? _currEl + (i? delimiter : EOL ) + el : el;
         // Does the string ends the current element?
         quoted = _currEl[0] == '"';
         length = _currEl.length;
@@ -127,9 +122,16 @@ if(typeof CSV.parse !== "function") {
     return output;
   };
 }
+
+CSV.regex = function(input) {
+  var output = [], matches, currLine;
+  while(matches = /(,|\r?\n|^)([^",\r\n]+|"(?:[^"]|"")*")?/g.exec( input )) {
+    if(currLine)
+  }
+}
  
 if(typeof CSV.stringify !== "function") {
-  CSV.stringify = function(data, options) {
+  CSV.stringify = function(input, options) {
      return
   };
 }
@@ -138,20 +140,4 @@ if(module && module.exports) {
   module.exports = CSV;
 };
 
-//(?:,|\r?\n|^)([^",\r\n]+|"(?:[^"]|"")*")?/
-// if(l && el[l - 1] == '"' && (l==1 || el[l - 2] != '"' || (l)))
-// && (length == 2 || (_currEl[length -2] != '"' || _currEl[length -3] == '"')))) {
-
-/*
- * if(el = /^(?:([^"]+)|"((?:[^"]|"")*)")?$/.exec(_currEl)) {
-           _currEl = el[1] || el[2] || el[0];
-           
-           currLine instanceof Array?
-             currLine.push(_currEl) :
-             currLine[header[currRow++]] = _currEl;
-             
-           currEl = undefined;
-        } else {
-          
-        }
- */
+//

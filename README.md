@@ -2,6 +2,7 @@ node.csv.js
 ===========
 
 A simple CSV API à la JSON.
+
 node.csv.js has been originally designed for node but can 
 be used client-side too, following json2.js's principles.
  
@@ -41,3 +42,9 @@ Example of advanced usage:
 
     var csvString = csv.stringify(csvArray, {header: ['last', 'fourth', 'third', 'second', 'first']});
     assert.equal(csvString, "string,csv,simple,really,a\nexample,simple,really,a,for");
+    
+Limitations
+-----------
+
+CSV.parse expects corretly formated CSV strings!
+Please submit bug if you think a correct CSV is not parsed properly.
