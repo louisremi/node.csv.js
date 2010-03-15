@@ -46,5 +46,5 @@ Example of advanced usage:
 Limitations
 -----------
 
-CSV.parse expects corretly formated CSV strings!
+CSV.parse expects correctly formated CSV strings!
 Please submit bug if you think a correct CSV is not parsed properly.
