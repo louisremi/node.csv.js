@@ -2,22 +2,23 @@ var assert = require('assert');
 var CSV = require('./csv');
 
 // Single string parsing
-assert.deepEqual(CSV.parse(''), []);
+assert.deepEqual(CSV.parse(''), [null]);
 assert.deepEqual(CSV.parse('a'), [['a']]);
 assert.deepEqual(CSV.parse('abc'), [['abc']]);
+// Ambiguous CSV string, doesn't really matter
 //assert.deepEqual(CSV.parse('"'), [['"']]);
 assert.deepEqual(CSV.parse(','), [['','']]);
 assert.deepEqual(CSV.parse('a,b'), [['a','b']]);
-assert.deepEqual(CSV.parse('\n'), []);
+assert.deepEqual(CSV.parse('\n'), [['']]);
 assert.deepEqual(CSV.parse('a\nb'), [['a'],['b']]);
-assert.deepEqual(CSV.parse('\r\n'), []);
+assert.deepEqual(CSV.parse('\r\n'), [['']]);
 assert.deepEqual(CSV.parse('a\r\nb'), [['a'],['b']]);
 assert.deepEqual(CSV.parse('abc,def'), [['abc','def']]);
 assert.deepEqual(CSV.parse('abc\ndef'), [['abc'],['def']]);
 assert.deepEqual(CSV.parse('abc\r\ndef'), [['abc'],['def']]);
 
 // Quoted string parsing
-assert.deepEqual(CSV.parse('""'), []);
+assert.deepEqual(CSV.parse('""'), [['']]);
 assert.deepEqual(CSV.parse('"a"'), [['a']]);
 assert.deepEqual(CSV.parse('"abc"'), [['abc']]);
 assert.deepEqual(CSV.parse('","'), [[',']]);
@@ -25,11 +26,11 @@ assert.deepEqual(CSV.parse('"",""'), [['','']]);
 assert.deepEqual(CSV.parse('"a,b"'), [['a,b']]);
 assert.deepEqual(CSV.parse('"a","b"'), [['a','b']]);
 assert.deepEqual(CSV.parse('"\n"'), [['\n']]);
-assert.deepEqual(CSV.parse('""\n""'), []);
+assert.deepEqual(CSV.parse('""\n""'), [[''], ['']]);
 assert.deepEqual(CSV.parse('"a\nb"'), [['a\nb']]);
 assert.deepEqual(CSV.parse('"a"\n"b"'), [['a'],['b']]);
 assert.deepEqual(CSV.parse('"\r\n"'), [['\r\n']]);
-assert.deepEqual(CSV.parse('""\r\n""'), []);
+assert.deepEqual(CSV.parse('""\r\n""'), [[''], ['']]);
 assert.deepEqual(CSV.parse('"a\r\nb"'), [['a\r\nb']]);
 assert.deepEqual(CSV.parse('"a"\r\n"b"'), [['a'],['b']]);
 assert.deepEqual(CSV.parse('"abc,def"'), [['abc,def']]);
@@ -58,6 +59,7 @@ assert.deepEqual(CSV.parse('"a"",""b"'), [['a","b']]);
 assert.deepEqual(CSV.parse('"a""""","""b"'), [['a""', '"b']]);
 assert.deepEqual(CSV.parse('"a"""\n"""b"'), [['a"'], ['"b']]);
 assert.deepEqual(CSV.parse('"a""\n""b"'), [['a"\n"b']]);
+
 
 var CSVArray = CSV.parse("a,really,simple,csv,string\nfor,a,really,simple,example", {header: ['first', 'second', 'third', 'fourth', 'last']});
 assert.deepEqual(CSVArray[0], {

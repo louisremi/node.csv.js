@@ -44,7 +44,7 @@ if(typeof CSV.parse !== "function") {
     
     var output = [],
       undefined,
-      currLine,
+      currLine = null,
       currRow,
       currEl,
       delimiter = options.delimiter || ',',
@@ -60,9 +60,15 @@ if(typeof CSV.parse !== "function") {
             '\n' :
             // Windows!
             '\r\n'
-          );
+          ),
+      lines = input.split(EOL);
     
-    input.split(EOL).forEach(function(line, i) {
+    // Get rid of last line if it is empty
+    if(lines[lines.length -1] == '') {
+      lines.pop();
+    }
+    
+    lines.forEach(function(line, i) {
       // Cache currLine
       var _currLine = currLine;
       
@@ -115,19 +121,25 @@ if(typeof CSV.parse !== "function") {
         }
       });
     });
-    // Push the last line and return
-    if(currLine.length > 1 || currLine[0] != '') {
-      output.push(currLine);
-    }
+    output.push(currLine);
     return output;
   };
 }
 
 CSV.regex = function(input) {
-  var output = [], matches, currLine;
-  while(matches = /(,|\r?\n|^)([^",\r\n]+|"(?:[^"]|"")*")?/g.exec( input )) {
-    if(currLine)
+  var output = [], matches, currLine = [];
+  while(matches = /(,|\r?\n|^)([^",\r\n]+|"((?:[^"]|"")*)")?/g.exec( input )) {
+    if(matches[1] != ',' && matches[1] != '') {
+      output.push(currLine);
+      currLine = [];
+    }
+    currLine.push(matches[3]? matches[3].split('""').join('"') : matches[2]);
   }
+  // push last line only if not empty
+  if(currLine.length > 1 || currLine[0]) {
+    output.push(currLine); 
+  }
+  return output;
 }
  
 if(typeof CSV.stringify !== "function") {
@@ -139,5 +151,3 @@ if(typeof CSV.stringify !== "function") {
 if(module && module.exports) {
   module.exports = CSV;
 };
-
-//
