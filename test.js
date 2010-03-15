@@ -1,5 +1,7 @@
 var assert = require('assert');
-var CSV = require('./csv');
+var CSV = require('./csv_alt');
+
+CSV.parse = CSV.parse2;
 
 // Single string parsing
 assert.deepEqual(CSV.parse(''), [null]);

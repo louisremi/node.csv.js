@@ -59,21 +59,22 @@ if(typeof CSV.parse !== "function") {
             // Windows!
             '\r\n'
           ),
-      lines = input.split(EOL);
+      lines = input.split(EOL),
+      rows,
+      ll = lines.length, li = -1, rl, ri,
+      quoted, length, trailingQuote;
     
     // Get rid of last line if it is empty
-    if(lines[lines.length -1] == '') {
+    if(lines[ll -1] == '') {
       lines.pop();
+      ll--;
     }
     
-    lines.forEach(function(line, i) {
-      // Cache currLine
-      var _currLine = currLine;
-      
+    while(++li < ll) {
       // add the current line to the output if not in the middle of an element
       if(!currEl) {
-        if(_currLine) {
-          i == 0 && header === true?
+        if(currLine) {
+          li == 0 && header === true?
             header = currLine :
             output.push(currLine);
         }
@@ -81,63 +82,46 @@ if(typeof CSV.parse !== "function") {
         currRow = 0;
       }
       
-      line.split(delimiter).forEach(function(el, i) {
-        // Cache currEl
-        var _currEl = currEl,
-          quoted, length, trailingQuote = 0;
-        
+      rows = lines[li].split(delimiter);
+      rl = rows.length;
+      ri = -1;
+      while(++ri < rl) {
         // restore the delimiter or line break if it was inside an element (_currEl == true) 
-        _currEl = _currEl? _currEl + (i? delimiter : EOL ) + el : el;
+        currEl = currEl? currEl + (ri? delimiter : EOL ) + rows[ri] : rows[ri];
+        
         // Does the string ends the current element?
-        quoted = _currEl[0] == '"';
-        length = _currEl.length;
-        if(!quoted || (_currEl[length -1] == '"' && length > 1)) {
+        quoted = currEl[0] == '"';
+        length = currEl.length;
+        if(!quoted || (currEl[length -1] == '"' && length > 1)) {
           if(quoted) {
-            _currEl = _currEl.slice(1,-1);
+            currEl = currEl.slice(1,-1);
             length -= 2;
             // We still need to make sure that _currEl doesn't end with an odd number of quotes (since "a"""" is an incomplete string)
-            while(_currEl[--length] == '"') {
+            trailingQuote = 0;
+            while(currEl[--length] == '"') {
               trailingQuote++;
             }
             trailingQuote %2?
               // Restore the quotes
-              currEl = '"' + _currEl + '"' :
+              currEl = '"' + currEl + '"' :
               quoted = false;
           }
           // _currEl is a complete element
           if(!quoted) {
             // undouble quotes
-            _currEl = _currEl.split('""').join('"');
+            currEl = currEl.split('""').join('"');
             currLine instanceof Array?
-              currLine.push(_currEl) :
-              currLine[header[currRow++]] = _currEl;
+              currLine.push(currEl) :
+              currLine[header[currRow++]] = currEl;
              
             currEl = undefined;
           }
-        } else {
-          currEl = _currEl;
         }
-      });
-    });
+      }
+    }
     output.push(currLine);
     return output;
   };
-}
-
-CSV.regex = function(input) {
-  var output = [], matches, currLine = [];
-  while(matches = /(,|\r?\n|^)([^",\r\n]+|"((?:[^"]|"")*)")?/g.exec( input )) {
-    if(matches[1] != ',' && matches[1] != '') {
-      output.push(currLine);
-      currLine = [];
-    }
-    currLine.push(matches[3]? matches[3].split('""').join('"') : matches[2]);
-  }
-  // push last line only if not empty
-  if(currLine.length > 1 || currLine[0]) {
-    output.push(currLine); 
-  }
-  return output;
 }
  
 if(typeof CSV.stringify !== "function") {
