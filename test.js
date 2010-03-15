@@ -5,7 +5,7 @@ var CSV = require('./csv');
 assert.deepEqual(CSV.parse(''), [null]);
 assert.deepEqual(CSV.parse('a'), [['a']]);
 assert.deepEqual(CSV.parse('abc'), [['abc']]);
-// Ambiguous CSV string, doesn't really matter
+// Ambiguous CSV string, doesn't have to pass
 //assert.deepEqual(CSV.parse('"'), [['"']]);
 assert.deepEqual(CSV.parse(','), [['','']]);
 assert.deepEqual(CSV.parse('a,b'), [['a','b']]);
@@ -60,6 +60,15 @@ assert.deepEqual(CSV.parse('"a""""","""b"'), [['a""', '"b']]);
 assert.deepEqual(CSV.parse('"a"""\n"""b"'), [['a"'], ['"b']]);
 assert.deepEqual(CSV.parse('"a""\n""b"'), [['a"\n"b']]);
 
+assert.deepEqual(CSV.parse("a,really,simple,csv,string\nfor,a,really,simple,example"), [
+  ['a','really','simple','csv','string'],
+  ['for', 'a', 'really', 'simple', 'example']
+]);
+
+assert.deepEqual(CSV.parse("a,really,simple,csv,string\nfor,a,really,simple,example\n"), [
+  ['a','really','simple','csv','string'],
+  ['for', 'a', 'really', 'simple', 'example']
+]);
 
 var CSVArray = CSV.parse("a,really,simple,csv,string\nfor,a,really,simple,example", {header: ['first', 'second', 'third', 'fourth', 'last']});
 assert.deepEqual(CSVArray[0], {

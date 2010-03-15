@@ -31,8 +31,6 @@
  * assert.equal(csvString, "string,csv,simple,really,a\nexample,simple,really,a,for");
  */
 
-sys = require('sys');
-
 // Create a CSV object only if one does not already exist.
 if (!this.CSV) {
     CSV = {};
@@ -148,6 +146,6 @@ if(typeof CSV.stringify !== "function") {
   };
 }
 
-if(module && module.exports) {
+if(typeof module != 'undefined' && typeof module.exports != 'undefined') {
   module.exports = CSV;
 };
