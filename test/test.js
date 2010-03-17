@@ -1,17 +1,22 @@
 var assert = require('assert');
-var CSV = require('./csv');
+var CSV = require('./../csv');
+
+// Ambiguous CSV string, doesn't have to pass
+//assert.deepEqual(CSV.parse(''), [null]);
+//assert.deepEqual(CSV.parse('"'), [['"']]);
+
+// String starts with empty element
+/*assert.deepEqual(CSV.parse(','), [['','']]);
+assert.deepEqual(CSV.parse(',,'), [['','','']]);
+assert.deepEqual(CSV.parse('\n'), [['']]);
+assert.deepEqual(CSV.parse('\nab'), [[''],['ab']]);
+assert.deepEqual(CSV.parse('\r\n'), [['']]);*/
 
 // Single string parsing
-assert.deepEqual(CSV.parse(''), [null]);
 assert.deepEqual(CSV.parse('a'), [['a']]);
 assert.deepEqual(CSV.parse('abc'), [['abc']]);
-// Ambiguous CSV string, doesn't have to pass
-//assert.deepEqual(CSV.parse('"'), [['"']]);
-assert.deepEqual(CSV.parse(','), [['','']]);
 assert.deepEqual(CSV.parse('a,b'), [['a','b']]);
-assert.deepEqual(CSV.parse('\n'), [['']]);
 assert.deepEqual(CSV.parse('a\nb'), [['a'],['b']]);
-assert.deepEqual(CSV.parse('\r\n'), [['']]);
 assert.deepEqual(CSV.parse('a\r\nb'), [['a'],['b']]);
 assert.deepEqual(CSV.parse('abc,def'), [['abc','def']]);
 assert.deepEqual(CSV.parse('abc\ndef'), [['abc'],['def']]);
@@ -27,6 +32,7 @@ assert.deepEqual(CSV.parse('"a,b"'), [['a,b']]);
 assert.deepEqual(CSV.parse('"a","b"'), [['a','b']]);
 assert.deepEqual(CSV.parse('"\n"'), [['\n']]);
 assert.deepEqual(CSV.parse('""\n""'), [[''], ['']]);
+assert.deepEqual(CSV.parse('""\n""\n'), [[''], ['']]);
 assert.deepEqual(CSV.parse('"a\nb"'), [['a\nb']]);
 assert.deepEqual(CSV.parse('"a"\n"b"'), [['a'],['b']]);
 assert.deepEqual(CSV.parse('"\r\n"'), [['\r\n']]);
