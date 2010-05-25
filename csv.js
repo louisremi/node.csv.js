@@ -29,6 +29,7 @@
  * 
  * var csvString = csv.stringify(csvArray, {header: ['last', 'fourth', 'third', 'second', 'first']});
  * assert.equal(csvString, "string,csv,simple,really,a\nexample,simple,really,a,for");
+ * 
  */
 
 // Create a CSV object only if one does not already exist.
@@ -42,19 +43,30 @@ if(typeof CSV.parse !== "function") {
     
     var output = [], 
       header = options.header,
+      delimiter = options.delimiter || ',',
       matches, lastMatches,
       headerIsArray = header instanceof Array,
-      currLine = (headerIsArray? {} : []), currRow = 0, currEl;
-    while(matches = /(,|\r?\n|^)([^",\r\n]+|"((?:[^"]|"")*)")?/g.exec( input )) {
-      if(matches[1] != ',' && matches[1] != '') {
-        output.push(currLine);
+      currLine = (headerIsArray? {} : []), currCol = 0, currEl,
+      // It is always slower to compile a new regex, use pre-built ones as much as possible (they will be cached)
+      re = delimiter == ','? /(,|\r?\n|^)([^",\r\n]+|"((?:[^"]|"")*)")?/g :
+        (delimiter == ';'? /(;|\r?\n|^)([^";\r\n]+|"((?:[^"]|"")*)")?/g : 
+        (delimiter == '\t'? /(\t|\r?\n|^)([^"\t\r\n]+|"((?:[^"]|"")*)")?/g :
+        new RegExp('('+delimiter+'|\\r?\\n|^)([^"'+delimiter+'\\r\\n]+|"((?:[^"]|"")*)")?', "g")));
+    while(matches = re.exec( input )) {
+      if(matches[1] != delimiter && matches[1] != '') {
+        if(header === true) {
+          header = currLine;
+          headerIsArray = true;
+        } else {
+          output.push(currLine);
+        }
         currLine = headerIsArray? {} : [];
-        currRow = 0;
+        currCol = 0;
       }
       lastMatches = matches;
       currEl = typeof matches[3] === 'string'? matches[3].split('""').join('"') : matches[2];
       headerIsArray?
-        currLine[header[currRow++]] = currEl :
+        currLine[header[currCol++]] = currEl :
         currLine.push(currEl);
     }
     // push last line only if not empty
@@ -62,12 +74,49 @@ if(typeof CSV.parse !== "function") {
       output.push(currLine); 
     }
     return output;
-  };  
+  };
 }
- 
+
 if(typeof CSV.stringify !== "function") {
   CSV.stringify = function(input, options) {
-     return
+     var data, head, 
+       delimiter = options? options.delimiter || "," : ",",
+       dataInArrays,
+       length, i = -1, row,
+       l, j = -1,
+       output = "";
+     if(input) {
+       data = input.data || input;
+       head = input.head;
+     } else {
+       data = head = false;
+     }
+     
+     dataInArrays = data[0] instanceof Array
+     
+     if(!head && !dataInArrays) {
+       throw new Error("Header required for unordered rows");
+     } else if(head) {
+       l = head.length;
+       while(++j < l) {
+         output += JSON.stringify(head[j])+delimiter;
+       }
+       output += '\r\n';
+     }
+     
+     length = data.length;
+     while(++i < length) {
+       row = data[i];       
+       j = -1;
+       if(dataInArrays) {
+         l = row.length;
+       }
+       while(++j < l) {
+         output += JSON.stringify(row[dataInArrays? j : head[j]])+delimiter;
+       }
+       output += '\r\n';
+     }
+     return output;
   };
 }
 
